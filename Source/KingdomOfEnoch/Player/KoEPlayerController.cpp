@@ -2,10 +2,99 @@
 
 
 #include "KoEPlayerController.h"
+#include "EnhancedInputComponent.h"
+#include "EnhancedInputSubsystems.h"
+#include "InputMappingContext.h"
+#include "InputAction.h"
+#include "UObject/ConstructorHelpers.h"
+
+AKoEPlayerController::AKoEPlayerController()
+{
+    // Load your assets from /Game/Input/
+    static ConstructorHelpers::FObjectFinder<UInputMappingContext> IMCObj(TEXT("/Game/Input/KoEInputMappingContext.KoEInputMappingContext"));
+    static ConstructorHelpers::FObjectFinder<UInputAction> MFObj(TEXT("/Game/Input/KoEMoveIA.KoEMoveIA"));
+    static ConstructorHelpers::FObjectFinder<UInputAction> IntObj(TEXT("/Game/Input/KoEInteractIA.KoEInteractIA"));
+
+    IMC_Default = IMCObj.Succeeded() ? IMCObj.Object : nullptr;
+    IA_Move = MFObj.Succeeded() ? MFObj.Object : nullptr;
+    IA_Interact = IntObj.Succeeded() ? IntObj.Object : nullptr;
+
+	// Log the results for debugging
+    if (IMC_Default)
+    {
+        UE_LOG(LogTemp, Log, TEXT("Input Mapping Context loaded: %s"), *IMC_Default->GetName());
+    }
+    else
+    {
+        UE_LOG(LogTemp, Warning, TEXT("Failed to load Input Mapping Context!"));
+    }
+    if (IA_Move)
+    {
+        UE_LOG(LogTemp, Log, TEXT("Move Input Action loaded: %s"), *IA_Move->GetName());
+    }
+    else
+    {
+        UE_LOG(LogTemp, Warning, TEXT("Failed to load Move Input Action!"));
+    }
+    if (IA_Interact)
+    {
+        UE_LOG(LogTemp, Log, TEXT("Interact Input Action loaded: %s"), *IA_Interact->GetName());
+    }
+    else
+    {
+        UE_LOG(LogTemp, Warning, TEXT("Failed to load Interact Input Action!"));
+	}
+}
+
+void AKoEPlayerController::BeginPlay()
+{
+    Super::BeginPlay();
+    if (ULocalPlayer* LP = GetLocalPlayer())
+    {
+        if (UEnhancedInputLocalPlayerSubsystem* Subsystem = LP->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>())
+        {
+            Subsystem->AddMappingContext(IMC_Default, /*Priority*/0);
+        }
+    }
+}
 
 void AKoEPlayerController::SetupInputComponent()
 {
-	Super::SetupInputComponent();
+    Super::SetupInputComponent();
+    if (UEnhancedInputComponent* EIC = Cast<UEnhancedInputComponent>(InputComponent))
+    {
+        if (IA_Move)
+        {
+            EIC->BindAction(IA_Move, ETriggerEvent::Triggered, this, &AKoEPlayerController::Input_Move2D);
+            EIC->BindAction(IA_Move, ETriggerEvent::Completed, this, &AKoEPlayerController::Input_Move2D);
+        }
+        if (IA_Interact)
+        {
+            EIC->BindAction(IA_Interact, ETriggerEvent::Started, this, &AKoEPlayerController::Input_Interact);
+        }
+    }
+}
+
+void AKoEPlayerController::Input_Move2D(const FInputActionValue& V)
+{
+    if (APawn* P = GetPawn())
+    {
+        const FVector2D M = V.Get<FVector2D>();
+        // If your camera can rotate, use controller yaw so movement is camera-relative:
+        const FRotator Yaw(0.f, GetControlRotation().Yaw, 0.f);
+        const FVector Forward = FRotationMatrix(Yaw).GetUnitAxis(EAxis::X);
+        const FVector Right = FRotationMatrix(Yaw).GetUnitAxis(EAxis::Y);
+
+        P->AddMovementInput(Forward, M.Y); // W/S
+        P->AddMovementInput(Right, M.X); // A/D
+
+        UE_LOG(LogTemp, Log, TEXT("Move2D: X=%.2f Y=%.2f"), M.X, M.Y);
+    }
+}
+
+void AKoEPlayerController::Input_Interact()
+{
+    ServerTryInteract();
 }
 
 void AKoEPlayerController::ServerTryInteract_Implementation()

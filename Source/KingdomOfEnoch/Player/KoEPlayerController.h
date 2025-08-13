@@ -4,7 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
+#include "InputActionValue.h"
 #include "KoEPlayerController.generated.h"
+
+class UInputAction;
+class UInputMappingContext;
 
 /**
  * 
@@ -14,9 +18,23 @@ class KINGDOMOFENOCH_API AKoEPlayerController : public APlayerController
 {
 	GENERATED_BODY()
 public:
+    AKoEPlayerController();
+
+    virtual void BeginPlay() override;
+
     virtual void SetupInputComponent() override;
 
-    // Example interaction request from client server
+protected:
+    UFUNCTION()
+    void Input_Move2D(const FInputActionValue& V);
+    UFUNCTION()
+    void Input_Interact();
+
     UFUNCTION(Server, Reliable)
     void ServerTryInteract();
+
+protected:
+    UPROPERTY() UInputMappingContext* IMC_Default = nullptr;
+    UPROPERTY() UInputAction* IA_Move = nullptr;
+    UPROPERTY() UInputAction* IA_Interact    = nullptr;
 };
