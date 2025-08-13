@@ -17,33 +17,7 @@ AKoEPlayerController::AKoEPlayerController()
 
     IMC_Default = IMCObj.Succeeded() ? IMCObj.Object : nullptr;
     IA_Move = MFObj.Succeeded() ? MFObj.Object : nullptr;
-    IA_Interact = IntObj.Succeeded() ? IntObj.Object : nullptr;
-
-	// Log the results for debugging
-    if (IMC_Default)
-    {
-        UE_LOG(LogTemp, Log, TEXT("Input Mapping Context loaded: %s"), *IMC_Default->GetName());
-    }
-    else
-    {
-        UE_LOG(LogTemp, Warning, TEXT("Failed to load Input Mapping Context!"));
-    }
-    if (IA_Move)
-    {
-        UE_LOG(LogTemp, Log, TEXT("Move Input Action loaded: %s"), *IA_Move->GetName());
-    }
-    else
-    {
-        UE_LOG(LogTemp, Warning, TEXT("Failed to load Move Input Action!"));
-    }
-    if (IA_Interact)
-    {
-        UE_LOG(LogTemp, Log, TEXT("Interact Input Action loaded: %s"), *IA_Interact->GetName());
-    }
-    else
-    {
-        UE_LOG(LogTemp, Warning, TEXT("Failed to load Interact Input Action!"));
-	}
+    IA_Interact = IntObj.Succeeded() ? IntObj.Object : nullptr;	
 }
 
 void AKoEPlayerController::BeginPlay()
