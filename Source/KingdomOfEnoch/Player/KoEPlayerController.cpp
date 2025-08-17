@@ -7,6 +7,7 @@
 #include "InputMappingContext.h"
 #include "InputAction.h"
 #include "UObject/ConstructorHelpers.h"
+#include "KoEPlayerCharacter.h"
 
 AKoEPlayerController::AKoEPlayerController()
 {
@@ -69,9 +70,14 @@ void AKoEPlayerController::Input_Move2D(const FInputActionValue& V)
 void AKoEPlayerController::Input_Interact()
 {
     ServerTryInteract();
+    // (optional) Predict locally: 
+    if (AKoEPlayerCharacter* C = GetPawn<AKoEPlayerCharacter>()) C->TryInteract();
 }
 
 void AKoEPlayerController::ServerTryInteract_Implementation()
 {
-
+    if (AKoEPlayerCharacter* C = GetPawn<AKoEPlayerCharacter>())
+    {
+        C->TryInteract();         // runs on the server
+    }
 }

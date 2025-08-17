@@ -3,10 +3,13 @@
 
 #include "KoEPlayerState.h"
 #include "Net/UnrealNetwork.h"
+#include "../Quests/QuestLogComponent.h"
 
 AKoEPlayerState::AKoEPlayerState()
 {
 	bReplicates = true;
+
+	QuestComp = CreateDefaultSubobject<UQuestLogComponent>("QuestComp");
 }
 
 void AKoEPlayerState::OnRep_Level()

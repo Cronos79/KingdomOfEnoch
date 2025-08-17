@@ -8,11 +8,11 @@ public class KingdomOfEnoch : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "Networking", "Sockets" });
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "NavigationSystem", "Engine", "InputCore", "EnhancedInput", "AIModule", "Networking", "Sockets", "UMG" });
 
 		PrivateDependencyModuleNames.AddRange(new string[] {
-			"Slate", "SlateCore"
-            // "GameplayAbilities", "GameplayTags", "GameplayTasks" // (enable later if you adopt GAS)
+			"Slate", "SlateCore",
+            "GameplayAbilities", "GameplayTags", "GameplayTasks" // (enable later if you adopt GAS)
 			});
 
 		// Uncomment if you are using Slate UI

@@ -6,9 +6,8 @@
 #include "GameFramework/PlayerState.h"
 #include "KoEPlayerState.generated.h"
 
-/**
- * 
- */
+class UQuestLogComponent;
+
 UCLASS()
 class KINGDOMOFENOCH_API AKoEPlayerState : public APlayerState
 {
@@ -17,6 +16,9 @@ public:
     AKoEPlayerState();
 
 protected:
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UQuestLogComponent* QuestComp;
+
     UPROPERTY(ReplicatedUsing=OnRep_Level, BlueprintReadOnly, Category="Player")
     int32 Level = 1;
 
